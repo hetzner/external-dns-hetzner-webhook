@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.1.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.1.1)
+
+### Bug Fixes
+
+- use nonroot user in container image (#16)
+
 ## [v0.1.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.1.0)
 
 This release introduces the new [ExternalDNS](https://kubernetes-sigs.github.io/external-dns) webhook for Hetzner.
