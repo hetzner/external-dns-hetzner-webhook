@@ -6,8 +6,8 @@ Welcome to the documentation for the **External DNS Hetzner webhook**.
 
 This documentation is written and organized following the [Diátaxis guidelines](https://diataxis.fr/). Below you can find a high-level overview of where to look for certain things:
 
-- [Guides](guides)
-- [Reference](reference)
+- [Guides](guides/README.md)
+- [Reference](reference/README.md)
 
 ## Getting help
 
