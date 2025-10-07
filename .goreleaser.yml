@@ -32,7 +32,6 @@ kos:
     labels:
       org.opencontainers.image.source: https://github.com/hetzner/external-dns-hetzner-webhook
     tags:
-      - latest
       - "{{.Tag}}"
 
 archives:
