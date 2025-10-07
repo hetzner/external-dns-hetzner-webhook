@@ -21,8 +21,6 @@ stringData:
 ```yaml
 # values.yml
 policy: sync
-extraArgs:
-  - "--txt-new-format-only" # We recommend using only the new format, to reduce the strain on the API.
 provider:
   name: webhook
   webhook:
@@ -36,8 +34,6 @@ provider:
             name: hetzner
             key: token
 ```
-
-> For more details about `--txt-new-format-only`, see the [ExternalDNS record format documentation](https://kubernetes-sigs.github.io/external-dns/latest/docs/registry/txt/#record-format-options).
 
 4. Add the ExternalDNS Helm repository
 
