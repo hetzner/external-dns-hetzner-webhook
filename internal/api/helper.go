@@ -18,6 +18,15 @@ func findZoneByHostname(zones []*hcloud.Zone, hostname string) (*hcloud.Zone, er
 	return nil, fmt.Errorf("could not find zone with hostname: %s", hostname)
 }
 
+func getZoneRRSetName(dnsName string, zone *hcloud.Zone) string {
+	zoneRRSetName := strings.TrimSuffix(dnsName, fmt.Sprintf(".%s", zone.Name))
+	// For domain apex records, use "@" as the RRSet name
+	if zoneRRSetName == zone.Name {
+		zoneRRSetName = "@"
+	}
+	return zoneRRSetName
+}
+
 func parseArrayFromEnv(env string) []string {
 	envVal := os.Getenv(env)
 	if envVal == "" {

@@ -65,8 +65,14 @@ func (p *Provider) Records(ctx context.Context) ([]*endpoint.Endpoint, error) {
 			return nil, err
 		}
 		for _, rrset := range rrsets {
+			var dnsName string
+			if rrset.Name == "@" {
+				dnsName = zone.Name
+			} else {
+				dnsName = fmt.Sprintf("%s.%s", rrset.Name, zone.Name)
+			}
 			ep := &endpoint.Endpoint{
-				DNSName:    fmt.Sprintf("%s.%s", rrset.Name, zone.Name),
+				DNSName:    dnsName,
 				RecordType: string(rrset.Type),
 			}
 
@@ -125,7 +131,7 @@ func (p *Provider) applyCreateChanges(
 			return err
 		}
 
-		zoneRRSetName := strings.TrimSuffix(ep.DNSName, fmt.Sprintf(".%s", zone.Name))
+		zoneRRSetName := getZoneRRSetName(ep.DNSName, zone)
 
 		zoneRRSet := &hcloud.ZoneRRSet{
 			Zone: zone,
@@ -182,7 +188,7 @@ func (p *Provider) applyDeleteChanges(
 			return err
 		}
 
-		zoneRRSetName := strings.TrimSuffix(ep.DNSName, fmt.Sprintf(".%s", zone.Name))
+		zoneRRSetName := getZoneRRSetName(ep.DNSName, zone)
 
 		zoneRRSet := &hcloud.ZoneRRSet{
 			Zone: zone,
@@ -228,7 +234,7 @@ func (p *Provider) applyUpdateChanges(
 			return err
 		}
 
-		zoneRRSetName := strings.TrimSuffix(endpointsOld[i].DNSName, fmt.Sprintf(".%s", zone.Name))
+		zoneRRSetName := getZoneRRSetName(endpointsOld[i].DNSName, zone)
 
 		// Update TTL
 		ttlOld := int(endpointsOld[i].RecordTTL)

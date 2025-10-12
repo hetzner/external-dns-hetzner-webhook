@@ -85,6 +85,63 @@ func TestFindZoneByHostname(t *testing.T) {
 	}
 }
 
+func TestFindZoneByHostnameDomainApex(t *testing.T) {
+	tests := []struct {
+		name     string
+		zones    []*hcloud.Zone
+		hostname string
+		want     *hcloud.Zone
+		wantErr  assert.ErrorAssertionFunc
+	}{
+		{
+			name: "domain apex should match zone exactly",
+			zones: []*hcloud.Zone{
+				{
+					Name: "example.com",
+				},
+			},
+			hostname: "example.com",
+			want: &hcloud.Zone{
+				Name: "example.com",
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "subdomain should match zone",
+			zones: []*hcloud.Zone{
+				{
+					Name: "example.com",
+				},
+			},
+			hostname: "sub.example.com",
+			want: &hcloud.Zone{
+				Name: "example.com",
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "domain apex should not match longer zone name",
+			zones: []*hcloud.Zone{
+				{
+					Name: "sub.example.com",
+				},
+			},
+			hostname: "example.com",
+			want:     nil,
+			wantErr:  assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := findZoneByHostname(tt.zones, tt.hostname)
+			if !tt.wantErr(t, err, fmt.Sprintf("findZoneByHostname(%v, %v)", tt.zones, tt.hostname)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "findZoneByHostname(%v, %v)", tt.zones, tt.hostname)
+		})
+	}
+}
+
 func TestParseArrayFromEnv(t *testing.T) {
 	tests := []struct {
 		name string

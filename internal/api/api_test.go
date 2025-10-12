@@ -112,6 +112,31 @@ func TestRecords(t *testing.T) {
 				}
 			},
 		},
+		{
+			name:       "single zone domain apex record",
+			zoneNameFn: func(id string) string { return fmt.Sprintf("example-%s.com", id) },
+			expectedFn: func(zoneName string) []*endpoint.Endpoint {
+				return []*endpoint.Endpoint{
+					{
+						DNSName: zoneName, // Domain apex
+						Targets: endpoint.NewTargets("127.0.0.1"),
+					}}
+			},
+			mocksFn: func(zoneName string) []mockutil.Request {
+				return []mockutil.Request{
+					testutil.GetZonesMock(zoneName),
+					testutil.GetRRSetsMock(
+						"@", // Domain apex RRSet name
+						string(hcloud.ZoneRRSetTypeA),
+						[]schema.ZoneRRSetRecord{
+							{
+								Value: "127.0.0.1",
+							},
+						},
+					),
+				}
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -187,6 +212,46 @@ func TestApplyCreateChanges(t *testing.T) {
 				return mocks
 			},
 		},
+		{
+			name:       "create domain apex rrset",
+			zoneNameFn: func(id string) string { return fmt.Sprintf("example-%s.com", id) },
+			inputEndpointsFn: func(zoneName string) []*endpoint.Endpoint {
+				return []*endpoint.Endpoint{
+					{
+						DNSName:    zoneName, // Domain apex
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+					},
+				}
+			},
+			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
+				mocks := make([]mockutil.Request, 0)
+				for _, ep := range inputEndpoints {
+					mocks = append(mocks, mockutil.Request{
+						Method: "POST",
+						Path:   fmt.Sprintf("/zones/%s/rrsets/@/%s/actions/add_records", zoneName, ep.RecordType),
+						Status: 200,
+						Want: func(t *testing.T, r *http.Request) {
+							request := schema.ZoneRRSetAddRecordsRequest{}
+							require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+							assert.Equal(
+								t,
+								schema.ZoneRRSetAddRecordsRequest{
+									Records: []schema.ZoneRRSetRecord{
+										{Value: "127.0.0.1"},
+									},
+								},
+								request,
+							)
+						},
+						JSON: schema.ActionGetResponse{
+							Action: schema.Action{ID: 1, Command: "add_rrset_records", Status: "success"},
+						},
+					})
+				}
+				return mocks
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -232,6 +297,33 @@ func TestApplyDeleteChanges(t *testing.T) {
 					mocks = append(mocks, mockutil.Request{
 						Method: "DELETE",
 						Path:   fmt.Sprintf("/zones/%s/rrsets/%s/%s", zoneName, "test", ep.RecordType),
+						Status: 200,
+						JSON: schema.ActionGetResponse{
+							Action: schema.Action{ID: 1, Command: "delete_rrset", Status: "success"},
+						},
+					})
+				}
+				return mocks
+			},
+		},
+		{
+			name:       "delete domain apex rrset",
+			zoneNameFn: func(id string) string { return fmt.Sprintf("example-%s.com", id) },
+			inputEndpointsFn: func(zoneName string) []*endpoint.Endpoint {
+				return []*endpoint.Endpoint{
+					{
+						DNSName:    zoneName, // Domain apex
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+					},
+				}
+			},
+			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
+				mocks := make([]mockutil.Request, 0)
+				for _, ep := range inputEndpoints {
+					mocks = append(mocks, mockutil.Request{
+						Method: "DELETE",
+						Path:   fmt.Sprintf("/zones/%s/rrsets/@/%s", zoneName, ep.RecordType),
 						Status: 200,
 						JSON: schema.ActionGetResponse{
 							Action: schema.Action{ID: 1, Command: "delete_rrset", Status: "success"},
