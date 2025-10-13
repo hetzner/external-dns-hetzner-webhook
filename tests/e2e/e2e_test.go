@@ -46,6 +46,22 @@ func TestCreateRecords(t *testing.T) {
 		expect       func(t *testing.T, service *corev1.Service, rrSet *hcloud.ZoneRRSet)
 	}{
 		{
+			name:         "apex domain record with ttl",
+			recordPrefix: "",
+			annotations: func(fqdn string) map[string]string {
+				return map[string]string{
+					"internal-hostname": fqdn,
+					"ttl":               "64",
+				}
+			},
+			expect: func(t *testing.T, service *corev1.Service, rrSet *hcloud.ZoneRRSet) {
+				assert.Equal(t, 64, *rrSet.TTL)
+
+				require.Len(t, rrSet.Records, 1)
+				assert.Equal(t, service.Spec.ClusterIP, rrSet.Records[0].Value)
+			},
+		},
+		{
 			name:         "single record with ttl",
 			recordPrefix: "nginx",
 			annotations: func(fqdn string) map[string]string {
@@ -80,7 +96,10 @@ func TestCreateRecords(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := t.Context()
 			randID := randutil.GenerateID()
-			recordName := fmt.Sprintf("%s-%s", tt.recordPrefix, randID)
+			recordName := fmt.Sprintf("a%s", randID) // needs to start with an alphabetic character
+			if tt.recordPrefix != "" {
+				recordName = fmt.Sprintf("%s-%s", tt.recordPrefix, randID)
+			}
 
 			fqdn, err := cluster.GenerateFQDN(recordName)
 			require.NoError(t, err)
