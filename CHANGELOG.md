@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.1.2](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.1.2)
+
+### Bug Fixes
+
+- wrong record name for apex domain (#27)
+
 ## [v0.1.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.1.1)
 
 ### Bug Fixes
