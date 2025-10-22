@@ -210,6 +210,8 @@ github.com/gophercloud/gophercloud/v2 v2.8.0 h1:of2+8tT6+FbEYHfYC8GBu8TXJNsXYSNm
 github.com/gophercloud/gophercloud/v2 v2.8.0/go.mod h1:Ki/ILhYZr/5EPebrPL9Ej+tUg4lqx71/YH2JWVeU+Qk=
 github.com/hetznercloud/hcloud-go/v2 v2.27.0 h1:SOGpAP3kQ6+aevB4Hxr63ukNsdYJjHhuWNB1C3NsiJo=
 github.com/hetznercloud/hcloud-go/v2 v2.27.0/go.mod h1:OVlbjfoEuvNPI8ji3Sm/jPkjOxO7MKEiPyfctZ0R8jw=
+github.com/hetznercloud/hcloud-go/v2 v2.28.0 h1:xX8Wq39MdZ5B9Cgvd8nKLbS+UVDpQoaYAVUeN4gCUxk=
+github.com/hetznercloud/hcloud-go/v2 v2.28.0/go.mod h1:XBU4+EDH2KVqu2KU7Ws0+ciZcX4ygukQl/J0L5GS8P8=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
