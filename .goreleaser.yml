@@ -23,7 +23,7 @@ kos:
   - id: container-image
     build: binary
     repositories:
-      - hetznercloud/external-dns-hetzner-webhook
+      - hetzner/external-dns-hetzner-webhook
     platforms:
       - linux/amd64
       - linux/arm64

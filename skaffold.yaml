@@ -4,7 +4,7 @@ metadata:
   name: external-dns-hetzner-webhook
 build:
   artifacts:
-    - image: docker.io/hetznercloud/external-dns-hetzner-webhook
+    - image: docker.io/hetzner/external-dns-hetzner-webhook
       ko: {}
   local:
     useBuildkit: true
@@ -23,8 +23,8 @@ deploy:
           provider:
             webhook:
               image:
-                repository: "{{.IMAGE_REPO_docker_io_hetznercloud_external_dns_hetzner_webhook}}"
-                tag: "{{.IMAGE_TAG_docker_io_hetznercloud_external_dns_hetzner_webhook}}"
+                repository: "{{.IMAGE_REPO_docker_io_hetzner_external_dns_hetzner_webhook}}"
+                tag: "{{.IMAGE_TAG_docker_io_hetzner_external_dns_hetzner_webhook}}"
         setValues:
           namespace: default
           policy: sync
