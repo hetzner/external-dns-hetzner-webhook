@@ -2,7 +2,7 @@ module github.com/hetzner/external-dns-hetzner-webhook
 
 go 1.25.0
 
-toolchain go1.25.3
+toolchain go1.25.4
 
 require (
 	github.com/hetznercloud/hcloud-go/v2 v2.29.0
