@@ -60,7 +60,11 @@ func (p *Provider) Records(ctx context.Context) ([]*endpoint.Endpoint, error) {
 
 	var endpoints []*endpoint.Endpoint
 	for _, zone := range zones {
-		rrsets, err := p.client.Zone.AllRRSets(ctx, zone)
+		rrsets, err := p.client.Zone.AllRRSetsWithOpts(ctx, zone, hcloud.ZoneRRSetListOpts{
+			ListOpts: hcloud.ListOpts{
+				PerPage: 100,
+			},
+		})
 		if err != nil {
 			return nil, err
 		}

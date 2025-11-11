@@ -58,7 +58,7 @@ func GetRRSetsMock(
 	rrSetRecords []schema.ZoneRRSetRecord,
 ) mockutil.Request {
 	return mockutil.Request{
-		Method: "GET", Path: "/zones/1/rrsets?page=1&per_page=50",
+		Method: "GET", Path: "/zones/1/rrsets?page=1&per_page=100",
 		Status: 200,
 		JSON: schema.ZoneRRSetListResponse{
 			RRSets: []schema.ZoneRRSet{
