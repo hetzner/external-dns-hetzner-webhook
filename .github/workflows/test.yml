@@ -12,6 +12,17 @@ jobs:
     permissions:
       id-token: write
 
+    strategy:
+      fail-fast: false # Continue tests matrix if a flaky run occurs.
+      matrix:
+        k8s:
+          - 1.32
+          - 1.33
+          - 1.34
+
+    env:
+      KUBERNETES_VERSION: ${{ matrix.k8s }}
+
     steps:
       - uses: actions/checkout@v5
 
