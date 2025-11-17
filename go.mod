@@ -9,9 +9,9 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.47.0
-	k8s.io/api v0.34.1
-	k8s.io/apimachinery v0.34.1
-	k8s.io/client-go v0.34.1
+	k8s.io/api v0.34.2
+	k8s.io/apimachinery v0.34.2
+	k8s.io/client-go v0.34.2
 	k8s.io/kops v1.34.0
 	sigs.k8s.io/controller-runtime v0.22.4
 	sigs.k8s.io/external-dns v0.19.0
