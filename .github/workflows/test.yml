@@ -33,7 +33,7 @@ jobs:
 
       - name: Install test tools
         env:
-          CRANE_VERSION: v0.20.6 # renovate: datasource=github-releases depName=google/go-containerregistry
+          CRANE_VERSION: v0.20.7 # renovate: datasource=github-releases depName=google/go-containerregistry
         run: |
           go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
           go install github.com/google/go-containerregistry/cmd/crane@$CRANE_VERSION
