@@ -1,8 +1,6 @@
 module github.com/hetzner/external-dns-hetzner-webhook
 
-go 1.25.0
-
-toolchain go1.25.4
+go 1.25.4
 
 require (
 	github.com/hetznercloud/hcloud-go/v2 v2.32.0
@@ -12,7 +10,7 @@ require (
 	k8s.io/api v0.34.2
 	k8s.io/apimachinery v0.34.2
 	k8s.io/client-go v0.34.2
-	k8s.io/kops v1.34.0
+	k8s.io/kops v1.34.1
 	sigs.k8s.io/controller-runtime v0.22.4
 	sigs.k8s.io/external-dns v0.20.0
 	sigs.k8s.io/yaml v1.6.0
@@ -113,7 +111,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.45.0 // indirect
-	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9 // indirect
+	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 // indirect
 	golang.org/x/oauth2 v0.33.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
