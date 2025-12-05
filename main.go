@@ -10,8 +10,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	webhookApi "sigs.k8s.io/external-dns/provider/webhook/api"
 
-	"github.com/hetzner/external-dns-hetzner-webhook/internal/api"
 	"github.com/hetzner/external-dns-hetzner-webhook/internal/metrics"
+	"github.com/hetzner/external-dns-hetzner-webhook/internal/provider"
 	"github.com/hetzner/external-dns-hetzner-webhook/internal/version"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud/exp/kit/envutil"
@@ -46,7 +46,7 @@ func main() {
 
 	hcloudClient := hcloud.NewClient(clientOpts...)
 
-	provider := api.NewProvider(hcloudClient, logger)
+	provider := provider.NewProvider(hcloudClient, logger)
 
 	metricsAddr := ":8080"
 	if addr, ok := os.LookupEnv("METRICS_ADDRESS"); ok {

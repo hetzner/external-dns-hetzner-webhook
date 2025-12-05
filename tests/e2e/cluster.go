@@ -21,7 +21,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	webhook "sigs.k8s.io/external-dns/provider/webhook/api"
 
-	"github.com/hetzner/external-dns-hetzner-webhook/internal/api"
+	"github.com/hetzner/external-dns-hetzner-webhook/internal/provider"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud/exp/kit/randutil"
 )
@@ -282,7 +282,7 @@ func SetupHCloudClient() (*hcloud.Client, error) {
 
 func StartWebhook(client *hcloud.Client) {
 	logger := slog.New(slog.DiscardHandler)
-	provider := api.NewProvider(client, logger)
+	provider := provider.NewProvider(client, logger)
 	startChan := make(chan struct{})
 	go webhook.StartHTTPApi(
 		provider,
