@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -34,6 +35,7 @@ func main() {
 		hcloud.WithToken(hcloudToken),
 		hcloud.WithInstrumentation(prometheus.DefaultRegisterer),
 		hcloud.WithApplication("external-dns-hetzner-webhook", version.Version),
+		hcloud.WithHTTPClient(&http.Client{Timeout: 15 * time.Second}),
 	}
 
 	if hcloudEndpoint != "" {
