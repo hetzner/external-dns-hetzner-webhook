@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.1)
+
+### Bug Fixes
+
+- set API http client timeout to 15s (#62)
+
 ## [v0.3.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.0)
 
 ### Features
