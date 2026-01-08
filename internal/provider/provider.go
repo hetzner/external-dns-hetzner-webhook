@@ -241,22 +241,20 @@ func (p *Provider) applyUpdateChanges(
 		zoneRRSetName := getZoneRRSetName(endpointsOld[i].DNSName, zone)
 
 		// Update TTL
-		ttlOld := int(endpointsOld[i].RecordTTL)
-		ttlNew := int(endpointsNew[i].RecordTTL)
-		if ttlOld != ttlNew {
+		if endpointsOld[i].RecordTTL != endpointsNew[i].RecordTTL {
 			zoneRRSet := &hcloud.ZoneRRSet{
 				Zone: zone,
 				Name: zoneRRSetName,
 				Type: hcloud.ZoneRRSetType(endpointsOld[i].RecordType),
 			}
 
-			action, _, err := p.client.Zone.ChangeRRSetTTL(
-				ctx,
-				zoneRRSet,
-				hcloud.ZoneRRSetChangeTTLOpts{
-					TTL: &ttlNew,
-				},
-			)
+			opts := hcloud.ZoneRRSetChangeTTLOpts{}
+
+			if endpointsNew[i].RecordTTL.IsConfigured() {
+				opts.TTL = hcloud.Ptr(int(endpointsNew[i].RecordTTL))
+			}
+
+			action, _, err := p.client.Zone.ChangeRRSetTTL(ctx, zoneRRSet, opts)
 			if err != nil {
 				return err
 			}

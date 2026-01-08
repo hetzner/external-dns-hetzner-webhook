@@ -3,6 +3,7 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -367,7 +368,19 @@ func TestApplyUpdateChanges(t *testing.T) {
 			oldEndpointsFn: func(zoneName string) []*endpoint.Endpoint {
 				return []*endpoint.Endpoint{
 					{
-						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
+						DNSName:    fmt.Sprintf("%s.%s", "noop", zoneName),
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+						RecordTTL:  endpoint.TTL(3600),
+					},
+					{
+						DNSName:    fmt.Sprintf("%s.%s", "test1", zoneName),
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+						RecordTTL:  endpoint.TTL(3600),
+					},
+					{
+						DNSName:    fmt.Sprintf("%s.%s", "test2", zoneName),
 						RecordType: "A",
 						Targets:    []string{"127.0.0.1"},
 						RecordTTL:  endpoint.TTL(3600),
@@ -377,29 +390,53 @@ func TestApplyUpdateChanges(t *testing.T) {
 			newEndpointsFn: func(zoneName string) []*endpoint.Endpoint {
 				return []*endpoint.Endpoint{
 					{
-						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
+						DNSName:    fmt.Sprintf("%s.%s", "noop", zoneName),
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+						RecordTTL:  endpoint.TTL(3600),
+					},
+					{
+						DNSName:    fmt.Sprintf("%s.%s", "test1", zoneName),
 						RecordType: "A",
 						Targets:    []string{"127.0.0.1"},
 						RecordTTL:  endpoint.TTL(1800),
 					},
+					{
+						DNSName:    fmt.Sprintf("%s.%s", "test2", zoneName),
+						RecordType: "A",
+						Targets:    []string{"127.0.0.1"},
+						RecordTTL:  endpoint.TTL(0),
+					},
 				}
 			},
 			mocksFn: func(zoneName string, oldEndpoints []*endpoint.Endpoint, newEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0, len(oldEndpoints))
-				for _, ep := range oldEndpoints {
-					mocks = append(mocks, mockutil.Request{
+				mocks := []mockutil.Request{
+					{
 						Method: "POST",
-						Path:   fmt.Sprintf("/zones/%s/rrsets/%s/%s/actions/change_ttl", zoneName, "test", ep.RecordType),
+						Path:   fmt.Sprintf("/zones/%s/rrsets/test1/A/actions/change_ttl", zoneName),
 						Status: 200,
 						Want: func(t *testing.T, r *http.Request) {
-							request := schema.ZoneChangeTTLRequest{}
-							require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
-							assert.Equal(t, schema.ZoneChangeTTLRequest{TTL: 1800}, request)
+							body, err := io.ReadAll(r.Body)
+							require.NoError(t, err)
+							require.JSONEq(t, `{ "ttl": 1800 }`, string(body))
 						},
 						JSON: schema.ActionGetResponse{
 							Action: schema.Action{ID: 1, Command: "change_rrset_ttl", Status: "success"},
 						},
-					})
+					},
+					{
+						Method: "POST",
+						Path:   fmt.Sprintf("/zones/%s/rrsets/test2/A/actions/change_ttl", zoneName),
+						Status: 200,
+						Want: func(t *testing.T, r *http.Request) {
+							body, err := io.ReadAll(r.Body)
+							require.NoError(t, err)
+							require.JSONEq(t, `{ "ttl": null }`, string(body))
+						},
+						JSON: schema.ActionGetResponse{
+							Action: schema.Action{ID: 1, Command: "change_rrset_ttl", Status: "success"},
+						},
+					},
 				}
 				return mocks
 			},
