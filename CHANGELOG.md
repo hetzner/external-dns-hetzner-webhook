@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.2](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.2)
+
+### Bug Fixes
+
+- unset ttl when not configured (#69)
+
 ## [v0.3.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.1)
 
 ### Bug Fixes
