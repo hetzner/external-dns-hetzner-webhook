@@ -185,7 +185,7 @@ func TestApplyCreateChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(inputEndpoints))
 				for _, ep := range inputEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "POST",
@@ -225,7 +225,7 @@ func TestApplyCreateChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(inputEndpoints))
 				for _, ep := range inputEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "POST",
@@ -292,7 +292,7 @@ func TestApplyDeleteChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(inputEndpoints))
 				for _, ep := range inputEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "DELETE",
@@ -319,7 +319,7 @@ func TestApplyDeleteChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(inputEndpoints))
 				for _, ep := range inputEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "DELETE",
@@ -385,7 +385,7 @@ func TestApplyUpdateChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, oldEndpoints []*endpoint.Endpoint, newEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(oldEndpoints))
 				for _, ep := range oldEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "POST",
@@ -426,7 +426,7 @@ func TestApplyUpdateChanges(t *testing.T) {
 				}
 			},
 			mocksFn: func(zoneName string, oldEndpoints []*endpoint.Endpoint, newEndpoints []*endpoint.Endpoint) []mockutil.Request {
-				mocks := make([]mockutil.Request, 0)
+				mocks := make([]mockutil.Request, 0, len(oldEndpoints))
 				for _, ep := range oldEndpoints {
 					mocks = append(mocks, mockutil.Request{
 						Method: "POST",
