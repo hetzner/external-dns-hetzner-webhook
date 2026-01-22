@@ -213,11 +213,12 @@ func TestParseArrayFromEnv(t *testing.T) {
 
 func TestAdjustCNAMETarget(t *testing.T) {
 	tests := []struct {
-		name       string
-		zones      []*hcloud.Zone
-		dnsName    string
-		target     string
-		rrsetValue string
+		name          string
+		zones         []*hcloud.Zone
+		dnsName       string
+		target        string
+		rrsetValue    string
+		expectedError error
 	}{
 		{
 			name: "same zone target",
@@ -246,12 +247,21 @@ func TestAdjustCNAMETarget(t *testing.T) {
 			target:     "foo.example.com.",
 			rrsetValue: "foo.example.com.",
 		},
+		{
+			name: "unknown zone",
+			zones: []*hcloud.Zone{
+				{Name: "example.de"},
+			},
+			dnsName:       "foo.example.com",
+			target:        "foo.example.com.",
+			expectedError: fmt.Errorf("could not find zone with hostname: %s", "foo.example.com"),
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			target, err := adjustCNAMETarget(tt.zones, tt.dnsName, tt.target)
-			require.NoError(t, err)
+			require.Equal(t, tt.expectedError, err)
 			require.Equal(t, tt.rrsetValue, target)
 		})
 	}
