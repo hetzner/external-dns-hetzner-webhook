@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
@@ -206,6 +207,52 @@ func TestParseArrayFromEnv(t *testing.T) {
 			envKey := "TEST_DOMAINS"
 			t.Setenv(envKey, tt.env)
 			assert.Equalf(t, tt.want, parseArrayFromEnv(envKey), "parseArrayFromEnv(%v)", tt.env)
+		})
+	}
+}
+
+func TestAdjustCNAMETarget(t *testing.T) {
+	tests := []struct {
+		name       string
+		zones      []*hcloud.Zone
+		dnsName    string
+		target     string
+		rrsetValue string
+	}{
+		{
+			name: "same zone target",
+			zones: []*hcloud.Zone{
+				{Name: "example.de"},
+			},
+			dnsName:    "foo.example.de",
+			target:     "bar.example.de",
+			rrsetValue: "bar",
+		},
+		{
+			name: "same zone absolute target",
+			zones: []*hcloud.Zone{
+				{Name: "example.de"},
+			},
+			dnsName:    "foo.example.de",
+			target:     "bar.example.de.",
+			rrsetValue: "bar",
+		},
+		{
+			name: "different zone target",
+			zones: []*hcloud.Zone{
+				{Name: "example.de"},
+			},
+			dnsName:    "foo.example.de",
+			target:     "foo.example.com.",
+			rrsetValue: "foo.example.com.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			target, err := adjustCNAMETarget(tt.zones, tt.dnsName, tt.target)
+			require.NoError(t, err)
+			require.Equal(t, tt.rrsetValue, target)
 		})
 	}
 }

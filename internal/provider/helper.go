@@ -44,3 +44,25 @@ func parseArrayFromEnv(env string) []string {
 	}
 	return parts
 }
+
+func adjustCNAMETarget(zones []*hcloud.Zone, dnsName string, target string) (string, error) {
+	zone, err := findZoneByHostname(zones, dnsName)
+	if err != nil {
+		return "", err
+	}
+
+	var adjustedTarget string
+	zoneSuffix := fmt.Sprintf(".%s", zone.Name)
+	absoluteZoneSuffix := fmt.Sprintf(".%s.", zone.Name)
+	switch {
+	case strings.HasSuffix(target, zoneSuffix):
+		adjustedTarget = strings.TrimSuffix(target, zoneSuffix)
+	case strings.HasSuffix(target, absoluteZoneSuffix):
+		adjustedTarget = strings.TrimSuffix(target, absoluteZoneSuffix)
+	default:
+		// ensure CNAME targets in different zones end in a dot
+		adjustedTarget = strings.TrimSuffix(target, ".") + "."
+	}
+
+	return adjustedTarget, nil
+}

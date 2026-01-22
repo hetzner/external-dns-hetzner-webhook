@@ -145,6 +145,13 @@ func (p *Provider) applyCreateChanges(
 
 		var records []hcloud.ZoneRRSetRecord
 		for _, target := range ep.Targets {
+			if ep.RecordType == "CNAME" {
+				target, err = adjustCNAMETarget(zones, ep.DNSName, target)
+				if err != nil {
+					return err
+				}
+			}
+
 			records = append(records, hcloud.ZoneRRSetRecord{Value: target})
 		}
 
@@ -279,6 +286,13 @@ func (p *Provider) applyUpdateChanges(
 
 			records := make([]hcloud.ZoneRRSetRecord, 0, len(endpointsNew[i].Targets))
 			for _, target := range endpointsNew[i].Targets {
+				if endpointsNew[i].RecordType == "CNAME" {
+					target, err = adjustCNAMETarget(zones, endpointsNew[i].DNSName, target)
+					if err != nil {
+						return err
+					}
+				}
+
 				records = append(records, hcloud.ZoneRRSetRecord{Value: target})
 			}
 
