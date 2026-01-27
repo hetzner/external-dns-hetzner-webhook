@@ -13,7 +13,7 @@ provider "kubernetes" {
 }
 
 module "dev" {
-  source = "github.com/hetznercloud/kubernetes-dev-env?ref=v0.9.4"
+  source = "github.com/hetznercloud/kubernetes-dev-env?ref=v0.10.0"
 
   name                 = "external-dns-hetzner-webhook-${replace(var.name, "/[^a-zA-Z0-9-_]/", "-")}"
   hcloud_token         = var.hetzner_token
