@@ -1,5 +1,5 @@
 KUBERNETES_VERSION ?= 1.35.0 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools extractVersion=^envtest-v(?<version>.+)$
-EXTERNAL_DNS_VERSION = v0.20.0 # renovate: datasource=github-releases depName=kubernetes-sigs/external-dns
+EXTERNAL_DNS_VERSION = v0.21.0 # renovate: datasource=github-releases depName=kubernetes-sigs/external-dns
 
 external-dns:
 	crane export registry.k8s.io/external-dns/external-dns:$(EXTERNAL_DNS_VERSION) | tar -xv  --strip-components=1 /ko-app/external-dns
