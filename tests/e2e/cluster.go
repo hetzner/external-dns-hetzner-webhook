@@ -234,6 +234,8 @@ func (c *Cluster) StartExternalDNS(ctx context.Context) (*exec.Cmd, error) {
 		ctx,
 		"../../external-dns",
 		"--provider", "webhook",
+		// Longer running actions might cause the tests to be flaky.
+		// Increase the default timeouts for our test suite.
 		"--webhook-provider-read-timeout", "60s",
 		"--webhook-provider-write-timeout", "60s",
 		"--source", "service",
