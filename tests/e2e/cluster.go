@@ -234,6 +234,8 @@ func (c *Cluster) StartExternalDNS(ctx context.Context) (*exec.Cmd, error) {
 		ctx,
 		"../../external-dns",
 		"--provider", "webhook",
+		"--webhook-provider-read-timeout", "60s",
+		"--webhook-provider-write-timeout", "60s",
 		"--source", "service",
 		"--events",
 		"--interval", "60m",
