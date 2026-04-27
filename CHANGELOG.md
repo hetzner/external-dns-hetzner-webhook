@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.3](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.3)
+
+### Bug Fixes
+
+- ensure longest matching zone is selected (#112)
+
 ## [v0.3.2](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.2)
 
 ### Bug Fixes

@@ -26,7 +26,7 @@ provider:
   webhook:
     image:
       repository: docker.io/hetzner/external-dns-hetzner-webhook
-      tag: v0.3.2 # x-releaser-pleaser-version
+      tag: v0.3.3 # x-releaser-pleaser-version
     env:
       - name: HETZNER_TOKEN
         valueFrom:
