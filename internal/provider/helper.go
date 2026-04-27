@@ -9,13 +9,19 @@ import (
 )
 
 func findZoneByHostname(zones []*hcloud.Zone, hostname string) (*hcloud.Zone, error) {
+	var match *hcloud.Zone
 	for _, zone := range zones {
 		if strings.HasSuffix(hostname, zone.Name) {
-			return zone, nil
+			// Ensures the longest match is returned
+			if match == nil || len(match.Name) < len(zone.Name) {
+				match = zone
+			}
 		}
 	}
-
-	return nil, fmt.Errorf("could not find zone with hostname: %s", hostname)
+	if match == nil {
+		return nil, fmt.Errorf("could not find zone with hostname: %s", hostname)
+	}
+	return match, nil
 }
 
 func getZoneRRSetName(dnsName string, zone *hcloud.Zone) string {

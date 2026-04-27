@@ -57,6 +57,38 @@ func TestFindZoneByHostname(t *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
+			name: "no shorter suffix match",
+			zones: []*hcloud.Zone{
+				{
+					Name: "example.org",
+				},
+				{
+					Name: "prefix-example.org",
+				},
+			},
+			hostname: "testing.prefix-example.org",
+			want: &hcloud.Zone{
+				Name: "prefix-example.org",
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "no longer suffix match",
+			zones: []*hcloud.Zone{
+				{
+					Name: "example.org",
+				},
+				{
+					Name: "prefix-example.org",
+				},
+			},
+			hostname: "testing.example.org",
+			want: &hcloud.Zone{
+				Name: "example.org",
+			},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "no zone found",
 			zones: []*hcloud.Zone{
 				{
