@@ -1,4 +1,4 @@
-KUBERNETES_VERSION ?= 1.35.0 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools extractVersion=^envtest-v(?<version>.+)$
+KUBERNETES_VERSION ?= 1.36.2 # renovate: datasource=github-releases depName=kubernetes-sigs/controller-tools extractVersion=^envtest-v(?<version>.+)$
 EXTERNAL_DNS_VERSION = v0.21.0 # renovate: datasource=github-releases depName=kubernetes-sigs/external-dns
 
 external-dns:
