@@ -18,7 +18,7 @@ deploy:
         namespace: default
         remoteChart: external-dns
         repo: https://kubernetes-sigs.github.io/external-dns/
-        version: 1.15.0
+        version: 1.15.0 # renovate: datasource=github-releases depName=kubernetes-sigs/external-dns extractVersion=external-dns-helm-chart-(?<version>.*)
         setValueTemplates:
           provider:
             webhook:
@@ -39,3 +39,5 @@ deploy:
                     secretKeyRef:
                       name: hetzner
                       key: token
+                - name: LOG_LEVEL
+                  value: debug
