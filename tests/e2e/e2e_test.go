@@ -113,6 +113,7 @@ func TestCreateRecords(t *testing.T) {
 			zoneRRSet, err := cluster.WaitForRRSetCondition(
 				ctx,
 				recordNamePunycode,
+				hcloud.ZoneRRSetTypeA,
 				func(zoneRRSet *hcloud.ZoneRRSet) bool {
 					return zoneRRSet != nil
 				},
@@ -121,6 +122,72 @@ func TestCreateRecords(t *testing.T) {
 			require.NotNil(t, zoneRRSet)
 
 			tt.expect(t, svc, zoneRRSet)
+		})
+	}
+}
+
+func TestCreateCNAMERecords(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		target string
+		want   string
+	}{
+		{
+			name:   "absolute target in the same zone",
+			target: fmt.Sprintf("nginx.%s", cluster.zone.Name),
+			want:   fmt.Sprintf("nginx.%s.", cluster.zone.Name),
+		},
+		{
+			name:   "absolute target in the same zone (trailing dot stripped by external-dns)",
+			target: fmt.Sprintf("nginx.%s.", cluster.zone.Name),
+			want:   fmt.Sprintf("nginx.%s.", cluster.zone.Name),
+		},
+		{
+			name:   "absolute target in other zone",
+			target: "nginx.other.com",
+			want:   "nginx.other.com.",
+		},
+		{
+			name:   "absolute target in other zone (trailing dot stripped by external-dns)",
+			target: "nginx.other.com.",
+			want:   "nginx.other.com.",
+		},
+		{
+			name:   "relative target in the same zone",
+			target: "nginx",
+			want:   "nginx",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+			recordName := fmt.Sprintf("nginx-%s", randutil.GenerateID())
+
+			fqdn, err := cluster.GenerateFQDN(recordName)
+			require.NoError(t, err)
+
+			_, err = cluster.ApplyService(ctx, recordName, map[string]string{
+				"hostname": fqdn,
+				"target":   tt.target,
+			})
+			require.NoError(t, err)
+
+			zoneRRSet, err := cluster.WaitForRRSetCondition(
+				ctx,
+				recordName,
+				hcloud.ZoneRRSetTypeCNAME,
+				func(zoneRRSet *hcloud.ZoneRRSet) bool {
+					return zoneRRSet != nil
+				},
+			)
+			require.NoError(t, err)
+			require.NotNil(t, zoneRRSet)
+
+			require.Len(t, zoneRRSet.Records, 1)
+			assert.Equal(t, tt.want, zoneRRSet.Records[0].Value)
 		})
 	}
 }
@@ -146,6 +213,7 @@ func TestSimpleRecordLifecycle(t *testing.T) {
 		zoneRRSet, err := cluster.WaitForRRSetCondition(
 			ctx,
 			recordName,
+			hcloud.ZoneRRSetTypeA,
 			func(zoneRRSet *hcloud.ZoneRRSet) bool {
 				return zoneRRSet != nil
 			},
@@ -161,6 +229,7 @@ func TestSimpleRecordLifecycle(t *testing.T) {
 		zoneRRSet, err := cluster.WaitForRRSetCondition(
 			ctx,
 			recordName,
+			hcloud.ZoneRRSetTypeA,
 			func(zoneRRSet *hcloud.ZoneRRSet) bool {
 				return zoneRRSet == nil
 			},
@@ -192,6 +261,7 @@ func TestUpdateRecordTTL(t *testing.T) {
 		zoneRRSet, err := cluster.WaitForRRSetCondition(
 			ctx,
 			recordName,
+			hcloud.ZoneRRSetTypeA,
 			func(zoneRRSet *hcloud.ZoneRRSet) bool {
 				return zoneRRSet != nil
 			},
@@ -215,6 +285,7 @@ func TestUpdateRecordTTL(t *testing.T) {
 		zoneRRSet, err := cluster.WaitForRRSetCondition(
 			ctx,
 			recordName,
+			hcloud.ZoneRRSetTypeA,
 			func(zoneRRSet *hcloud.ZoneRRSet) bool {
 				return zoneRRSet != nil && *zoneRRSet.TTL != 1800
 			},
