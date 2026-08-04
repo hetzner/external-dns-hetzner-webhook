@@ -26,40 +26,46 @@ func TestAdjustEndpoints(t *testing.T) {
 		{
 			name: "convert to lowercase",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "MyDomain.example.com",
-				},
+				{DNSName: "MyDomain.example.com"},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com",
-				},
+				{DNSName: "mydomain.example.com"},
 			},
 		},
 		{
 			name: "convert to punicode",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "mydømain.example.com",
-				},
+				{DNSName: "mydømain.example.com"},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "xn--mydmain-s1a.example.com",
-				},
+				{DNSName: "xn--mydmain-s1a.example.com"},
 			},
 		},
 		{
 			name: "trim trailing dot",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com.",
-				},
+				{DNSName: "mydomain.example.com."},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com",
-				},
+				{DNSName: "mydomain.example.com"},
+			},
+		},
+		{
+			name: "CNAME targets",
+			incoming: []*endpoint.Endpoint{
+				{DNSName: "example.com.", RecordType: "CNAME", Targets: []string{"mydomain.example.com"}},
+			},
+			expected: []*endpoint.Endpoint{
+				{DNSName: "example.com", RecordType: "CNAME", Targets: []string{"mydomain.example.com."}},
+			},
+		},
+		{
+			name: "MX targets",
+			incoming: []*endpoint.Endpoint{
+				{DNSName: "example.com.", RecordType: "MX", Targets: []string{"mydomain.example.com"}},
+			},
+			expected: []*endpoint.Endpoint{
+				{DNSName: "example.com", RecordType: "MX", Targets: []string{"mydomain.example.com"}},
 			},
 		},
 	}
@@ -75,7 +81,7 @@ func TestAdjustEndpoints(t *testing.T) {
 			assert.Len(t, actual, len(tt.expected))
 
 			for i, ep := range actual {
-				assert.Equal(t, tt.expected[i].DNSName, ep.DNSName)
+				assert.Equal(t, tt.expected[i], ep)
 			}
 		})
 	}
@@ -261,7 +267,7 @@ func TestApplyCreateChanges(t *testing.T) {
 					{
 						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
 						RecordType: "CNAME",
-						Targets:    []string{"foo.mydomain.com"},
+						Targets:    []string{"foo.mydomain.com."},
 					},
 				}
 			},
@@ -498,7 +504,7 @@ func TestApplyUpdateChanges(t *testing.T) {
 					{
 						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
 						RecordType: "CNAME",
-						Targets:    []string{"bar.mydomain.com"},
+						Targets:    []string{"bar.mydomain.com."},
 					},
 				}
 			},
@@ -542,7 +548,6 @@ func TestApplyUpdateChanges(t *testing.T) {
 			hetznerProvider := NewProvider(client, logger)
 
 			zones := []*hcloud.Zone{{Name: zoneName}}
-
 			err := hetznerProvider.applyUpdateChanges(ctx, zones, oldEndpoints, newEndpoints)
 			assert.NoError(t, err)
 		})
