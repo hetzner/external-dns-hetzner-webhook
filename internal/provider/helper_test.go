@@ -213,56 +213,56 @@ func TestParseArrayFromEnv(t *testing.T) {
 
 func TestAdjustCNAMETarget(t *testing.T) {
 	tests := []struct {
-		name          string
-		zones         []*hcloud.Zone
-		dnsName       string
-		target        string
-		rrsetValue    string
-		expectedError error
+		name       string
+		zone       *hcloud.Zone
+		dnsName    string
+		target     string
+		wantTarget string
 	}{
 		{
-			name: "same zone target",
-			zones: []*hcloud.Zone{
-				{Name: "example.de"},
-			},
-			dnsName:    "foo.example.de",
-			target:     "bar.example.de",
-			rrsetValue: "bar",
+			name:       "absolute target in same zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.example.de",
+			wantTarget: "node1.example.de.",
 		},
 		{
-			name: "same zone absolute target",
-			zones: []*hcloud.Zone{
-				{Name: "example.de"},
-			},
-			dnsName:    "foo.example.de",
-			target:     "bar.example.de.",
-			rrsetValue: "bar",
+			name:       "absolute target in other zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.other.de",
+			wantTarget: "node1.other.de.",
 		},
 		{
-			name: "different zone target",
-			zones: []*hcloud.Zone{
-				{Name: "example.de"},
-			},
-			dnsName:    "foo.example.de",
-			target:     "foo.example.com.",
-			rrsetValue: "foo.example.com.",
+			name:       "relative target in same zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1",
+			wantTarget: "node1",
 		},
 		{
-			name: "unknown zone",
-			zones: []*hcloud.Zone{
-				{Name: "example.de"},
-			},
-			dnsName:       "foo.example.com",
-			target:        "foo.example.com.",
-			expectedError: fmt.Errorf("could not find zone with hostname: %s", "foo.example.com"),
+			// external-dns always strips the trailing dots, but we want to make sure we
+			// handle this case if it were to change.
+			name:       "absolute target in same zone with trailing dot",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.example.de.",
+			wantTarget: "node1.example.de.",
+		},
+		{
+			// external-dns always strips the trailing dots, but we want to make sure we
+			// handle this case if it were to change.
+			name:       "absolute target in other zone with trailing dot",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.other.de.",
+			wantTarget: "node1.other.de.",
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			target, err := adjustCNAMETarget(tt.zones, tt.dnsName, tt.target)
-			require.Equal(t, tt.expectedError, err)
-			require.Equal(t, tt.rrsetValue, target)
+			target := adjustCNAMETarget(tt.target)
+			require.Equal(t, tt.wantTarget, target)
 		})
 	}
 }
