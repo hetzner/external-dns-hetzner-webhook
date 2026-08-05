@@ -26,40 +26,46 @@ func TestAdjustEndpoints(t *testing.T) {
 		{
 			name: "convert to lowercase",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "MyDomain.example.com",
-				},
+				{DNSName: "MyDomain.example.com"},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com",
-				},
+				{DNSName: "mydomain.example.com"},
 			},
 		},
 		{
 			name: "convert to punicode",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "mydømain.example.com",
-				},
+				{DNSName: "mydømain.example.com"},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "xn--mydmain-s1a.example.com",
-				},
+				{DNSName: "xn--mydmain-s1a.example.com"},
 			},
 		},
 		{
 			name: "trim trailing dot",
 			incoming: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com.",
-				},
+				{DNSName: "mydomain.example.com."},
 			},
 			expected: []*endpoint.Endpoint{
-				{
-					DNSName: "mydomain.example.com",
-				},
+				{DNSName: "mydomain.example.com"},
+			},
+		},
+		{
+			name: "CNAME targets",
+			incoming: []*endpoint.Endpoint{
+				{DNSName: "example.com.", RecordType: "CNAME", Targets: []string{"mydomain.example.com"}},
+			},
+			expected: []*endpoint.Endpoint{
+				{DNSName: "example.com", RecordType: "CNAME", Targets: []string{"mydomain.example.com."}},
+			},
+		},
+		{
+			name: "MX targets",
+			incoming: []*endpoint.Endpoint{
+				{DNSName: "example.com.", RecordType: "MX", Targets: []string{"mydomain.example.com"}},
+			},
+			expected: []*endpoint.Endpoint{
+				{DNSName: "example.com", RecordType: "MX", Targets: []string{"mydomain.example.com"}},
 			},
 		},
 	}
@@ -75,7 +81,7 @@ func TestAdjustEndpoints(t *testing.T) {
 			assert.Len(t, actual, len(tt.expected))
 
 			for i, ep := range actual {
-				assert.Equal(t, tt.expected[i].DNSName, ep.DNSName)
+				assert.Equal(t, tt.expected[i], ep)
 			}
 		})
 	}
@@ -240,6 +246,46 @@ func TestApplyCreateChanges(t *testing.T) {
 								schema.ZoneRRSetAddRecordsRequest{
 									Records: []schema.ZoneRRSetRecord{
 										{Value: "127.0.0.1"},
+									},
+								},
+								request,
+							)
+						},
+						JSON: schema.ActionGetResponse{
+							Action: schema.Action{ID: 1, Command: "add_rrset_records", Status: "success"},
+						},
+					})
+				}
+				return mocks
+			},
+		},
+		{
+			name:       "create a single cname rrset",
+			zoneNameFn: func(id string) string { return fmt.Sprintf("example-%s.com", id) },
+			inputEndpointsFn: func(zoneName string) []*endpoint.Endpoint {
+				return []*endpoint.Endpoint{
+					{
+						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
+						RecordType: "CNAME",
+						Targets:    []string{"foo.mydomain.com."},
+					},
+				}
+			},
+			mocksFn: func(zoneName string, inputEndpoints []*endpoint.Endpoint) []mockutil.Request {
+				mocks := make([]mockutil.Request, 0, len(inputEndpoints))
+				for _, ep := range inputEndpoints {
+					mocks = append(mocks, mockutil.Request{
+						Method: "POST",
+						Path:   fmt.Sprintf("/zones/%s/rrsets/%s/%s/actions/add_records", zoneName, "test", ep.RecordType),
+						Status: 200,
+						Want: func(t *testing.T, r *http.Request) {
+							request := schema.ZoneRRSetAddRecordsRequest{}
+							require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+							assert.Equal(
+								t,
+								schema.ZoneRRSetAddRecordsRequest{
+									Records: []schema.ZoneRRSetRecord{
+										{Value: "foo.mydomain.com."},
 									},
 								},
 								request,
@@ -448,8 +494,8 @@ func TestApplyUpdateChanges(t *testing.T) {
 				return []*endpoint.Endpoint{
 					{
 						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
-						RecordType: "A",
-						Targets:    []string{"127.0.0.1"},
+						RecordType: "CNAME",
+						Targets:    []string{"foo.mydomain.com"},
 					},
 				}
 			},
@@ -457,8 +503,8 @@ func TestApplyUpdateChanges(t *testing.T) {
 				return []*endpoint.Endpoint{
 					{
 						DNSName:    fmt.Sprintf("%s.%s", "test", zoneName),
-						RecordType: "A",
-						Targets:    []string{"192.168.0.1"},
+						RecordType: "CNAME",
+						Targets:    []string{"bar.mydomain.com."},
 					},
 				}
 			},
@@ -475,7 +521,7 @@ func TestApplyUpdateChanges(t *testing.T) {
 							assert.Equal(
 								t,
 								schema.ZoneRRSetSetRecordsRequest{
-									Records: []schema.ZoneRRSetRecord{{Value: "192.168.0.1"}},
+									Records: []schema.ZoneRRSetRecord{{Value: "bar.mydomain.com."}},
 								},
 								request,
 							)
@@ -502,7 +548,6 @@ func TestApplyUpdateChanges(t *testing.T) {
 			hetznerProvider := NewProvider(client, logger)
 
 			zones := []*hcloud.Zone{{Name: zoneName}}
-
 			err := hetznerProvider.applyUpdateChanges(ctx, zones, oldEndpoints, newEndpoints)
 			assert.NoError(t, err)
 		})

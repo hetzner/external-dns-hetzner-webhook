@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
@@ -206,6 +207,62 @@ func TestParseArrayFromEnv(t *testing.T) {
 			envKey := "TEST_DOMAINS"
 			t.Setenv(envKey, tt.env)
 			assert.Equalf(t, tt.want, parseArrayFromEnv(envKey), "parseArrayFromEnv(%v)", tt.env)
+		})
+	}
+}
+
+func TestAdjustCNAMETarget(t *testing.T) {
+	tests := []struct {
+		name       string
+		zone       *hcloud.Zone
+		dnsName    string
+		target     string
+		wantTarget string
+	}{
+		{
+			name:       "absolute target in same zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.example.de",
+			wantTarget: "node1.example.de.",
+		},
+		{
+			name:       "absolute target in other zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.other.de",
+			wantTarget: "node1.other.de.",
+		},
+		{
+			name:       "relative target in same zone",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1",
+			wantTarget: "node1",
+		},
+		{
+			// external-dns always strips the trailing dots, but we want to make sure we
+			// handle this case if it were to change.
+			name:       "absolute target in same zone with trailing dot",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.example.de.",
+			wantTarget: "node1.example.de.",
+		},
+		{
+			// external-dns always strips the trailing dots, but we want to make sure we
+			// handle this case if it were to change.
+			name:       "absolute target in other zone with trailing dot",
+			zone:       &hcloud.Zone{Name: "example.de"},
+			dnsName:    "www.example.de",
+			target:     "node1.other.de.",
+			wantTarget: "node1.other.de.",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			target := adjustCNAMETarget(tt.target)
+			require.Equal(t, tt.wantTarget, target)
 		})
 	}
 }

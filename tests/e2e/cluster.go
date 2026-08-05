@@ -188,6 +188,7 @@ func (c *Cluster) Cleanup() error {
 func (c *Cluster) WaitForRRSetCondition(
 	ctx context.Context,
 	subdomain string,
+	rrSetType hcloud.ZoneRRSetType,
 	condition func(zoneRRSet *hcloud.ZoneRRSet) bool,
 ) (*hcloud.ZoneRRSet, error) {
 	backoffFn := hcloud.ExponentialBackoffWithOpts(
@@ -204,7 +205,7 @@ func (c *Cluster) WaitForRRSetCondition(
 			ctx,
 			c.zone,
 			subdomain,
-			hcloud.ZoneRRSetTypeA,
+			rrSetType,
 		)
 		if err != nil {
 			if !hcloud.IsError(err, hcloud.ErrorCodeNotFound) {

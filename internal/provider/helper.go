@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/net/publicsuffix"
+
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
@@ -43,4 +45,26 @@ func parseArrayFromEnv(env string) []string {
 		parts[i] = strings.TrimSpace(part)
 	}
 	return parts
+}
+
+// adjustCNAMETarget updates the CNAME record value, to work around the removal of trailing dots in external-dns
+// (https://github.com/kubernetes-sigs/external-dns/issues/6145).
+//
+// Using a relative CNAME target which ends with a public suffix (https://publicsuffix.org/) is not supported,
+// instead users must use an absolute CNAME target.
+//
+// For example given the zone "example.com", the relative target "embedded.other.de" (without trailing dot) must
+// use the following absolute CNAME target "embedded.other.de.example.com."
+//
+//	external-dns.kubernetes.io/hostname: "www.example.com"
+//	external-dns.kubernetes.io/target: "embedded.other.de.example.com."
+func adjustCNAMETarget(target string) string {
+	suffix, icann := publicsuffix.PublicSuffix(target)
+	// If target is ICANN or privately managed, append a trailing dot
+	// https://pkg.go.dev/golang.org/x/net/publicsuffix#example-PublicSuffix-Manager
+	if icann || strings.IndexByte(suffix, '.') >= 0 {
+		return strings.TrimSuffix(target, ".") + "."
+	}
+
+	return target
 }

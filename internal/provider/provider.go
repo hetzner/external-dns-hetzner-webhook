@@ -41,13 +41,29 @@ func (p *Provider) AdjustEndpoints(endpoints []*endpoint.Endpoint) ([]*endpoint.
 		if err != nil {
 			return nil, err
 		}
+		if ep.DNSName != dnsName {
+			p.logger.Debug(
+				"adjusted endpoint dns name",
+				"old-dns-name", ep.DNSName,
+				"new-dns-name", dnsName,
+			)
+			ep.DNSName = dnsName
+		}
 
-		p.logger.Debug(
-			"adjusted endpoint",
-			"input", ep.DNSName,
-			"output", dnsName,
-		)
-		ep.DNSName = dnsName
+		if ep.RecordType == "CNAME" {
+			for i := range ep.Targets {
+				target := adjustCNAMETarget(ep.Targets[i])
+				if ep.Targets[i] != target {
+					p.logger.Debug(
+						"adjusted endpoint target",
+						"dns-name", ep.DNSName,
+						"old-target", ep.Targets[i],
+						"new-target", target,
+					)
+					ep.Targets[i] = target
+				}
+			}
+		}
 	}
 	return endpoints, nil
 }
