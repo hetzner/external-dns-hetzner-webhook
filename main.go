@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -16,6 +17,10 @@ import (
 	"github.com/hetzner/external-dns-hetzner-webhook/internal/version"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud/exp/kit/envutil"
+)
+
+const (
+	AllowRelativeCNAMETargets = "ALLOW_RELATIVE_CNAME_TARGETS"
 )
 
 func main() {
@@ -48,7 +53,16 @@ func main() {
 
 	hcloudClient := hcloud.NewClient(clientOpts...)
 
-	provider := provider.NewProvider(hcloudClient, logger)
+	allowRelativeCNAMETargets := false
+	if env, ok := os.LookupEnv(AllowRelativeCNAMETargets); ok {
+		allowRelativeCNAMETargets, err = strconv.ParseBool(env)
+		if err != nil {
+			logger.Error("error parsing boolean config value", "env", AllowRelativeCNAMETargets, "error", err)
+			os.Exit(1)
+		}
+	}
+
+	provider := provider.NewProvider(hcloudClient, logger, allowRelativeCNAMETargets)
 
 	metricsAddr := ":8080"
 	if addr, ok := os.LookupEnv("METRICS_ADDRESS"); ok {

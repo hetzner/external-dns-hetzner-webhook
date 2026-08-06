@@ -213,56 +213,73 @@ func TestParseArrayFromEnv(t *testing.T) {
 
 func TestAdjustCNAMETarget(t *testing.T) {
 	tests := []struct {
-		name       string
-		zone       *hcloud.Zone
-		dnsName    string
-		target     string
+		name    string
+		zone    *hcloud.Zone
+		dnsName string
+		target  string
+		// Expected target with ALLOW_RELATIVE_CNAME_TARGETS disabled (default), every
+		// target is made absolute.
 		wantTarget string
+		// Expected target with ALLOW_RELATIVE_CNAME_TARGETS enabled, targets which do not
+		// end with a public suffix stay relative.
+		wantTargetRelativeAllowed string
 	}{
 		{
-			name:       "absolute target in same zone",
-			zone:       &hcloud.Zone{Name: "example.de"},
-			dnsName:    "www.example.de",
-			target:     "node1.example.de",
-			wantTarget: "node1.example.de.",
+			name:                      "absolute target in same zone",
+			zone:                      &hcloud.Zone{Name: "example.de"},
+			dnsName:                   "www.example.de",
+			target:                    "node1.example.de",
+			wantTarget:                "node1.example.de.",
+			wantTargetRelativeAllowed: "node1.example.de.",
 		},
 		{
-			name:       "absolute target in other zone",
-			zone:       &hcloud.Zone{Name: "example.de"},
-			dnsName:    "www.example.de",
-			target:     "node1.other.de",
-			wantTarget: "node1.other.de.",
+			name:                      "absolute target in other zone",
+			zone:                      &hcloud.Zone{Name: "example.de"},
+			dnsName:                   "www.example.de",
+			target:                    "node1.other.de",
+			wantTarget:                "node1.other.de.",
+			wantTargetRelativeAllowed: "node1.other.de.",
 		},
 		{
-			name:       "relative target in same zone",
-			zone:       &hcloud.Zone{Name: "example.de"},
-			dnsName:    "www.example.de",
-			target:     "node1",
-			wantTarget: "node1",
-		},
-		{
-			// external-dns always strips the trailing dots, but we want to make sure we
-			// handle this case if it were to change.
-			name:       "absolute target in same zone with trailing dot",
-			zone:       &hcloud.Zone{Name: "example.de"},
-			dnsName:    "www.example.de",
-			target:     "node1.example.de.",
-			wantTarget: "node1.example.de.",
+			name:                      "relative target in same zone",
+			zone:                      &hcloud.Zone{Name: "example.de"},
+			dnsName:                   "www.example.de",
+			target:                    "node1",
+			wantTarget:                "node1.",
+			wantTargetRelativeAllowed: "node1",
 		},
 		{
 			// external-dns always strips the trailing dots, but we want to make sure we
 			// handle this case if it were to change.
-			name:       "absolute target in other zone with trailing dot",
-			zone:       &hcloud.Zone{Name: "example.de"},
-			dnsName:    "www.example.de",
-			target:     "node1.other.de.",
-			wantTarget: "node1.other.de.",
+			name:                      "absolute target in same zone with trailing dot",
+			zone:                      &hcloud.Zone{Name: "example.de"},
+			dnsName:                   "www.example.de",
+			target:                    "node1.example.de.",
+			wantTarget:                "node1.example.de.",
+			wantTargetRelativeAllowed: "node1.example.de.",
+		},
+		{
+			// external-dns always strips the trailing dots, but we want to make sure we
+			// handle this case if it were to change.
+			name:                      "absolute target in other zone with trailing dot",
+			zone:                      &hcloud.Zone{Name: "example.de"},
+			dnsName:                   "www.example.de",
+			target:                    "node1.other.de.",
+			wantTarget:                "node1.other.de.",
+			wantTargetRelativeAllowed: "node1.other.de.",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			target := adjustCNAMETarget(tt.target)
-			require.Equal(t, tt.wantTarget, target)
+			t.Run("relative targets disallowed", func(t *testing.T) {
+				target := adjustCNAMETarget(tt.target, false)
+				require.Equal(t, tt.wantTarget, target)
+			})
+
+			t.Run("relative targets allowed", func(t *testing.T) {
+				target := adjustCNAMETarget(tt.target, true)
+				require.Equal(t, tt.wantTargetRelativeAllowed, target)
+			})
 		})
 	}
 }
