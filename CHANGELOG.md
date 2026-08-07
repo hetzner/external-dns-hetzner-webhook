@@ -1,5 +1,33 @@
 # Changelog
 
+## [v0.3.4](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.4)
+
+[Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.3...v0.3.4)
+
+### Trailing dots on CNAME targets are now restored
+
+External DNS strips the trailing dot from CNAME targets ([kubernetes-sigs/external-dns#6145](https://github.com/kubernetes-sigs/external-dns/issues/6145)). The Hetzner DNS API treats a value without a trailing dot as relative to the zone, so a target such as `foo.other.com` in zone `example.com` was stored as a relative name and resolved to `foo.other.com.example.com`.
+
+By default, the webhook now restores the trailing dot for any CNAME target.
+
+If you rely on relative targets, you can set `ALLOW_RELATIVE_CNAME_TARGETS=t`. With this flag enabled, the webhook only restores the trailing dot when the CNAME target ends in a public suffix ([publicsuffix.org](https://publicsuffix.org/)). Otherwise, the target is stored relative to the zone and is unaffected. You can read more about this feature [here](docs/guides/allow-relative-cname-targets.md).
+
+**Action required if you rely on a relative target.** With the default behavior (flag off), such a target is now treated as fully qualified. A target that previously resolved to `nginx.example.com` via the zone is now stored as `nginx.` and resolves to a different destination. Write the full name to keep the previous destination:
+
+```diff
+ metadata:
+   annotations:
+     external-dns.alpha.kubernetes.io/hostname: "www.example.com"
+-    external-dns.alpha.kubernetes.io/target: "nginx"
++    external-dns.alpha.kubernetes.io/target: "nginx.example.com."
+```
+
+Only CNAME targets are adjusted, other record types keep their previous behavior.
+
+### Bug Fixes
+
+- CNAME resolution when External DNS strips trailing dots (#77) ([768d0e9](https://github.com/hetzner/external-dns-hetzner-webhook/commit/768d0e9cf8acb82ea14498b20adc906c8fd4d2f5))
+
 ## [v0.3.4-rc.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.4-rc.0)
 
 [Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.3...v0.3.4-rc.0)
