@@ -50,15 +50,24 @@ func parseArrayFromEnv(env string) []string {
 // adjustCNAMETarget updates the CNAME record value, to work around the removal of trailing dots in external-dns
 // (https://github.com/kubernetes-sigs/external-dns/issues/6145).
 //
-// Using a relative CNAME target which ends with a public suffix (https://publicsuffix.org/) is not supported,
-// instead users must use an absolute CNAME target.
+// By default every target is made absolute by appending a trailing dot, this means relative targets cannot be
+// used.
+//
+// With allowRelativeCNAMETargets enabled, a target is only made absolute if it ends with a public suffix
+// (https://publicsuffix.org/), every other target is left untouched and stays relative to the zone of the
+// record. A relative target which ends with a public suffix is not supported in this mode, because it cannot
+// be told apart from an absolute target, instead users must use an absolute target.
 //
 // For example given the zone "example.com", the relative target "embedded.other.de" (without trailing dot) must
 // use the following absolute CNAME target "embedded.other.de.example.com."
 //
 //	external-dns.kubernetes.io/hostname: "www.example.com"
 //	external-dns.kubernetes.io/target: "embedded.other.de.example.com."
-func adjustCNAMETarget(target string) string {
+func adjustCNAMETarget(target string, allowRelativeCNAMETargets bool) string {
+	if !allowRelativeCNAMETargets {
+		return strings.TrimSuffix(target, ".") + "."
+	}
+
 	suffix, icann := publicsuffix.PublicSuffix(target)
 	// If target is ICANN or privately managed, append a trailing dot
 	// https://pkg.go.dev/golang.org/x/net/publicsuffix#example-PublicSuffix-Manager

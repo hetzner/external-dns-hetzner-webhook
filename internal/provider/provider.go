@@ -15,17 +15,20 @@ import (
 )
 
 type Provider struct {
-	client *hcloud.Client
-	logger *slog.Logger
+	client                    *hcloud.Client
+	logger                    *slog.Logger
+	allowRelativeCNAMETargets bool
 }
 
 func NewProvider(
 	client *hcloud.Client,
 	logger *slog.Logger,
+	allowRelativeCNAMETargets bool,
 ) *Provider {
 	return &Provider{
-		client: client,
-		logger: logger,
+		client:                    client,
+		logger:                    logger,
+		allowRelativeCNAMETargets: allowRelativeCNAMETargets,
 	}
 }
 
@@ -52,7 +55,7 @@ func (p *Provider) AdjustEndpoints(endpoints []*endpoint.Endpoint) ([]*endpoint.
 
 		if ep.RecordType == "CNAME" {
 			for i := range ep.Targets {
-				target := adjustCNAMETarget(ep.Targets[i])
+				target := adjustCNAMETarget(ep.Targets[i], p.allowRelativeCNAMETargets)
 				if ep.Targets[i] != target {
 					p.logger.Debug(
 						"adjusted endpoint target",

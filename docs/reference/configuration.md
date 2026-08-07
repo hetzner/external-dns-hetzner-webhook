@@ -4,16 +4,17 @@ This page references the different configurations for the External DNS Hetzner w
 
 ## Supported environment variables
 
-| Env                            | Type                  | Default          | Description                                                                                                          |
-| ------------------------------ | --------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `HETZNER_TOKEN`                | string (**required**) |                  | Hetzner Cloud API token.                                                                                             |
-| `INCLUDE_DOMAIN_FILTER`        | list of string        |                  | Inclusive filtering of target zones via domain suffixes. See [domain filters](#domain-filters) for more details.     |
-| `EXCLUDE_DOMAIN_FILTER`        | list of string        |                  | Exclusive filtering of target zones via domain suffixes. See [domain filters](#domain-filters) for more details.     |
-| `INCLUDE_REGEXP_DOMAIN_FILTER` | string                |                  | Inclusive filtering of target zones via regular expressions. See [domain filters](#domain-filters) for more details. |
-| `EXCLUDE_REGEXP_DOMAIN_FILTER` | string                |                  | Exclusive filtering of target zones via regular expressions. See [domain filters](#domain-filters) for more details. |
-| `LOG_LEVEL`                    | string                | `info`           | Log level of the webhook. Accepted values are `debug`, `info`, `warn`, `error`.                                      |
-| `WEBHOOK_ADDRESS`              | string                | `localhost:8888` | Listen address of the webhook.                                                                                       |
-| `METRICS_ADDRESS`              | string                | `:8080`          | Listen address of the prometheus metrics and health checks.                                                          |
+| Env                            | Type                  | Default          | Description                                                                                                                              |
+| ------------------------------ | --------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `HETZNER_TOKEN`                | string (**required**) |                  | Hetzner Cloud API token.                                                                                                                 |
+| `INCLUDE_DOMAIN_FILTER`        | list of string        |                  | Inclusive filtering of target zones via domain suffixes. See [domain filters](#domain-filters) for more details.                         |
+| `EXCLUDE_DOMAIN_FILTER`        | list of string        |                  | Exclusive filtering of target zones via domain suffixes. See [domain filters](#domain-filters) for more details.                         |
+| `INCLUDE_REGEXP_DOMAIN_FILTER` | string                |                  | Inclusive filtering of target zones via regular expressions. See [domain filters](#domain-filters) for more details.                     |
+| `EXCLUDE_REGEXP_DOMAIN_FILTER` | string                |                  | Exclusive filtering of target zones via regular expressions. See [domain filters](#domain-filters) for more details.                     |
+| `ALLOW_RELATIVE_CNAME_TARGETS` | boolean               | `false`          | Keep CNAME targets relative to the zone. See [allow relative CNAME targets](../guides/allow-relative-cname-targets.md) for more details. |
+| `LOG_LEVEL`                    | string                | `info`           | Log level of the webhook. Accepted values are `debug`, `info`, `warn`, `error`.                                                          |
+| `WEBHOOK_ADDRESS`              | string                | `localhost:8888` | Listen address of the webhook.                                                                                                           |
+| `METRICS_ADDRESS`              | string                | `:8080`          | Listen address of the prometheus metrics and health checks.                                                                              |
 
 ### Domain filters
 

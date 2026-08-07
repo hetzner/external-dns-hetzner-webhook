@@ -287,7 +287,7 @@ func SetupHCloudClient() (*hcloud.Client, error) {
 
 func StartWebhook(client *hcloud.Client) {
 	logger := slog.New(slog.DiscardHandler)
-	provider := provider.NewProvider(client, logger)
+	provider := provider.NewProvider(client, logger, false)
 	startChan := make(chan struct{})
 	go webhook.StartHTTPApi(
 		provider,

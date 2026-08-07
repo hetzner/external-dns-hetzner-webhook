@@ -126,6 +126,10 @@ func TestCreateRecords(t *testing.T) {
 	}
 }
 
+// TestCreateCNAMERecords covers the default behaviour, where every CNAME target is
+// made absolute. Relative targets require ALLOW_RELATIVE_CNAME_TARGETS and are covered
+// by the unit tests in TestAdjustCNAMETarget, the webhook under test runs as a single
+// instance with the default configuration.
 func TestCreateCNAMERecords(t *testing.T) {
 	t.Parallel()
 
@@ -157,7 +161,7 @@ func TestCreateCNAMERecords(t *testing.T) {
 		{
 			name:   "relative target in the same zone",
 			target: "nginx",
-			want:   "nginx",
+			want:   "nginx.",
 		},
 	}
 

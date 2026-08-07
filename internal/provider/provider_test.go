@@ -74,7 +74,7 @@ func TestAdjustEndpoints(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, _, _, client, logger := testutil.MakeTestUtils(t)
 
-			hetznerProvider := NewProvider(client, logger)
+			hetznerProvider := NewProvider(client, logger, false)
 
 			actual, err := hetznerProvider.AdjustEndpoints(tt.incoming)
 			require.NoError(t, err)
@@ -102,7 +102,8 @@ func TestRecords(t *testing.T) {
 					{
 						DNSName: fmt.Sprintf("mydomain.%s", zoneName),
 						Targets: endpoint.NewTargets("127.0.0.1"),
-					}}
+					},
+				}
 			},
 			mocksFn: func(zoneName string) []mockutil.Request {
 				return []mockutil.Request{
@@ -127,7 +128,8 @@ func TestRecords(t *testing.T) {
 					{
 						DNSName: zoneName, // Domain apex
 						Targets: endpoint.NewTargets("127.0.0.1"),
-					}}
+					},
+				}
 			},
 			mocksFn: func(zoneName string) []mockutil.Request {
 				return []mockutil.Request{
@@ -155,7 +157,7 @@ func TestRecords(t *testing.T) {
 
 			server.Expect(tt.mocksFn(zoneName))
 
-			hetznerProvider := NewProvider(client, logger)
+			hetznerProvider := NewProvider(client, logger, false)
 
 			actual, err := hetznerProvider.Records(ctx)
 			require.NoError(t, err)
@@ -309,7 +311,7 @@ func TestApplyCreateChanges(t *testing.T) {
 			inputEndpoints := tt.inputEndpointsFn(zoneName)
 			server.Expect(tt.mocksFn(zoneName, inputEndpoints))
 
-			hetznerProvider := NewProvider(client, logger)
+			hetznerProvider := NewProvider(client, logger, false)
 
 			zones := []*hcloud.Zone{{Name: zoneName}}
 
@@ -390,7 +392,7 @@ func TestApplyDeleteChanges(t *testing.T) {
 			inputEndpoints := tt.inputEndpointsFn(zoneName)
 			server.Expect(tt.mocksFn(zoneName, inputEndpoints))
 
-			hetznerProvider := NewProvider(client, logger)
+			hetznerProvider := NewProvider(client, logger, false)
 
 			zones := []*hcloud.Zone{{Name: zoneName}}
 
@@ -545,7 +547,7 @@ func TestApplyUpdateChanges(t *testing.T) {
 			newEndpoints := tt.newEndpointsFn(zoneName)
 			server.Expect(tt.mocksFn(zoneName, oldEndpoints, newEndpoints))
 
-			hetznerProvider := NewProvider(client, logger)
+			hetznerProvider := NewProvider(client, logger, false)
 
 			zones := []*hcloud.Zone{{Name: zoneName}}
 			err := hetznerProvider.applyUpdateChanges(ctx, zones, oldEndpoints, newEndpoints)
