@@ -12,6 +12,7 @@ dot and stores every CNAME target as an absolute name:
 | Target from ExternalDNS | Stored value         |
 | ----------------------- | -------------------- |
 | `nginx.example.com`     | `nginx.example.com.` |
+| `nginx.absolute.com.`     | `nginx.absolute.com.` |
 | `nginx.other.com`       | `nginx.other.com.`   |
 | `nginx`                 | `nginx.`             |
 
@@ -40,20 +41,20 @@ provider:
             key: token
 ```
 
-Targets are then only made absolute if they end with a [public suffix](https://publicsuffix.org/), every other
-target is left untouched and stays relative to the zone of the record:
+Targets will then only made absolute if they end with a [public suffix](https://publicsuffix.org/), every other
+targets are left untouched and stays relative to the zone of the record:
 
 | Target from ExternalDNS | Stored value         |
 | ----------------------- | -------------------- |
 | `nginx.example.com`     | `nginx.example.com.` |
+| `nginx.absolute.com.`     | `nginx.absolute.com.` |
 | `nginx.other.com`       | `nginx.other.com.`   |
 | `nginx`                 | `nginx`              |
+| `nginx.`     | `nginx` |
 
 ## Known limitation
 
-With `ALLOW_RELATIVE_CNAME_TARGETS` enabled, a relative target which ends with a public suffix cannot be
-expressed, because it is indistinguishable from an absolute target. You must use the absolute form instead, for
-the zone `example.com` the relative target `embedded.other.de` has to be given as:
+With `ALLOW_RELATIVE_CNAME_TARGETS` enabled, a relative target which ends with a public suffix cannot be expressed, because it is indistinguishable from an absolute target. You must use the absolute form instead, for the zone `example.com` the relative target `embedded.other.de` has to be given as:
 
 ```yaml
 external-dns.kubernetes.io/hostname: "www.example.com"
