@@ -5,7 +5,7 @@ go 1.26.3
 require (
 	github.com/hetznercloud/hcloud-go/v2 v2.47.0
 	github.com/prometheus/client_golang v1.24.1
-	github.com/stretchr/testify v1.12.0
+	github.com/stretchr/testify v1.12.1
 	golang.org/x/net v0.58.0
 	k8s.io/api v0.35.3
 	k8s.io/apimachinery v0.35.3
@@ -116,7 +116,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.43.0 // indirect
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a // indirect
 	golang.org/x/mod v0.38.0 // indirect
