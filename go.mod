@@ -10,7 +10,7 @@ require (
 	k8s.io/api v0.36.4
 	k8s.io/apimachinery v0.36.4
 	k8s.io/client-go v0.36.4
-	k8s.io/kops v1.35.1
+	k8s.io/kops v1.36.2
 	sigs.k8s.io/controller-runtime v0.24.1
 	sigs.k8s.io/external-dns v0.22.0
 	sigs.k8s.io/yaml v1.6.0
@@ -119,7 +119,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a // indirect
+	golang.org/x/exp v0.0.0-20260611194520-c48552f49976 // indirect
 	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
