@@ -108,7 +108,7 @@ func (c *Cluster) ApplyService(
 ) (*corev1.Service, error) {
 	annotationsFull := make(map[string]string, len(annotations))
 	for key, value := range annotations {
-		fullKey := fmt.Sprintf("%s/%s", "external-dns.alpha.kubernetes.io", key)
+		fullKey := fmt.Sprintf("%s/%s", "external-dns.kubernetes.io", key)
 		annotationsFull[fullKey] = value
 	}
 

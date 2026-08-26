@@ -6,7 +6,7 @@ metadata:
   labels:
     app: external-dns-test
   annotations:
-    external-dns.alpha.kubernetes.io/internal-hostname: "nginx.example.com"
+    external-dns.kubernetes.io/internal-hostname: "nginx.example.com"
 spec:
   ports:
     - protocol: TCP
