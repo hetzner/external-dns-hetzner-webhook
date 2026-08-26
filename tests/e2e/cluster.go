@@ -108,7 +108,7 @@ func (c *Cluster) ApplyService(
 ) (*corev1.Service, error) {
 	annotationsFull := make(map[string]string, len(annotations))
 	for key, value := range annotations {
-		fullKey := fmt.Sprintf("%s/%s", "external-dns.alpha.kubernetes.io", key)
+		fullKey := fmt.Sprintf("%s/%s", "external-dns.kubernetes.io", key)
 		annotationsFull[fullKey] = value
 	}
 
@@ -235,6 +235,7 @@ func (c *Cluster) StartExternalDNS(ctx context.Context) (*exec.Cmd, error) {
 		ctx,
 		"../../external-dns",
 		"--provider", "webhook",
+		"--policy", "sync",
 		// Longer running actions might cause the tests to be flaky.
 		// Increase the default timeouts for our test suite.
 		"--webhook-provider-read-timeout", "60s",
