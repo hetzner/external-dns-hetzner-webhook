@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.4.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.4.0)
+
+[Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.4...v0.4.0)
+
+### Features
+
+- support external-dns v0.22.0 ([b4fdb20](https://github.com/hetzner/external-dns-hetzner-webhook/commit/b4fdb2077377848185544f9d000ba32be2270ebc))
+- support Kubernetes v1.36 ([b4fdb20](https://github.com/hetzner/external-dns-hetzner-webhook/commit/b4fdb2077377848185544f9d000ba32be2270ebc))
+
+### Bug Fixes
+
+- drop Kubernetes v1.33 ([4cb4f9c](https://github.com/hetzner/external-dns-hetzner-webhook/commit/4cb4f9c4edb9fb6417e041f0c0c690cfac3cca70))
+
 ## [v0.3.4](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.3.4)
 
 [Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.3...v0.3.4)
