@@ -268,16 +268,42 @@ func TestAdjustCNAMETarget(t *testing.T) {
 			wantTarget:                "node1.other.de.",
 			wantTargetRelativeAllowed: "node1.other.de.",
 		},
+		{
+			name:                      "internationalized absolute target",
+			zone:                      &hcloud.Zone{Name: "exämple.de"},
+			dnsName:                   "nginx.exämple.de",
+			target:                    "nginx2.exämple.de",
+			wantTarget:                "nginx2.xn--exmple-cua.de.",
+			wantTargetRelativeAllowed: "nginx2.xn--exmple-cua.de.",
+		},
+		{
+			name:                      "internationalized absolute target with trailing dot",
+			zone:                      &hcloud.Zone{Name: "exämple.de"},
+			dnsName:                   "nginx.exämple.de",
+			target:                    "nginx2.exämple.de.",
+			wantTarget:                "nginx2.xn--exmple-cua.de.",
+			wantTargetRelativeAllowed: "nginx2.xn--exmple-cua.de.",
+		},
+		{
+			name:                      "internationalized relative target",
+			zone:                      &hcloud.Zone{Name: "exämple.de"},
+			dnsName:                   "nginx.exämple.de",
+			target:                    "nöde1",
+			wantTarget:                "xn--nde1-5qa.",
+			wantTargetRelativeAllowed: "xn--nde1-5qa",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run("relative targets disallowed", func(t *testing.T) {
-				target := adjustCNAMETarget(tt.target, false)
+				target, err := adjustCNAMETarget(tt.target, false)
+				require.NoError(t, err)
 				require.Equal(t, tt.wantTarget, target)
 			})
 
 			t.Run("relative targets allowed", func(t *testing.T) {
-				target := adjustCNAMETarget(tt.target, true)
+				target, err := adjustCNAMETarget(tt.target, true)
+				require.NoError(t, err)
 				require.Equal(t, tt.wantTargetRelativeAllowed, target)
 			})
 		})

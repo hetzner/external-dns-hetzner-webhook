@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/net/idna"
 	"golang.org/x/net/publicsuffix"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -47,8 +48,13 @@ func parseArrayFromEnv(env string) []string {
 	return parts
 }
 
-// adjustCNAMETarget updates the CNAME record value, to work around the removal of trailing dots in external-dns
-// (https://github.com/kubernetes-sigs/external-dns/issues/6145).
+// adjustCNAMETarget updates the CNAME record value.
+//
+// The target is converted to its IDNA (Punycode) form, because the Hetzner DNS API rejects
+// non-ASCII characters in record values.
+//
+// Additionally the trailing dot is restored, to work around the removal of trailing dots in
+// external-dns (https://github.com/kubernetes-sigs/external-dns/issues/6145).
 //
 // By default every target is made absolute by appending a trailing dot, this means relative targets cannot be
 // used.
@@ -63,17 +69,22 @@ func parseArrayFromEnv(env string) []string {
 //
 //	external-dns.kubernetes.io/hostname: "www.example.com"
 //	external-dns.kubernetes.io/target: "embedded.other.de.example.com."
-func adjustCNAMETarget(target string, allowRelativeCNAMETargets bool) string {
-	if !allowRelativeCNAMETargets {
-		return strings.TrimSuffix(target, ".") + "."
+func adjustCNAMETarget(target string, allowRelativeCNAMETargets bool) (string, error) {
+	asciiTarget, err := idna.ToASCII(target)
+	if err != nil {
+		return "", fmt.Errorf("could not convert CNAME target to ASCII: %s: %w", target, err)
 	}
 
-	suffix, icann := publicsuffix.PublicSuffix(target)
+	if !allowRelativeCNAMETargets {
+		return strings.TrimSuffix(asciiTarget, ".") + ".", nil
+	}
+
+	suffix, icann := publicsuffix.PublicSuffix(asciiTarget)
 	// If target is ICANN or privately managed, append a trailing dot
 	// https://pkg.go.dev/golang.org/x/net/publicsuffix#example-PublicSuffix-Manager
 	if icann || strings.IndexByte(suffix, '.') >= 0 {
-		return strings.TrimSuffix(target, ".") + "."
+		return strings.TrimSuffix(asciiTarget, ".") + ".", nil
 	}
 
-	return target
+	return asciiTarget, nil
 }
