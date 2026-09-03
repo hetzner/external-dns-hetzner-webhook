@@ -60,6 +60,15 @@ func TestAdjustEndpoints(t *testing.T) {
 			},
 		},
 		{
+			name: "internationalized CNAME targets",
+			incoming: []*endpoint.Endpoint{
+				{DNSName: "nginx.exämple.com", RecordType: "CNAME", Targets: []string{"nginx2.exämple.com"}},
+			},
+			expected: []*endpoint.Endpoint{
+				{DNSName: "nginx.xn--exmple-cua.com", RecordType: "CNAME", Targets: []string{"nginx2.xn--exmple-cua.com."}},
+			},
+		},
+		{
 			name: "MX targets",
 			incoming: []*endpoint.Endpoint{
 				{DNSName: "example.com.", RecordType: "MX", Targets: []string{"mydomain.example.com"}},

@@ -55,7 +55,10 @@ func (p *Provider) AdjustEndpoints(endpoints []*endpoint.Endpoint) ([]*endpoint.
 
 		if ep.RecordType == "CNAME" {
 			for i := range ep.Targets {
-				target := adjustCNAMETarget(ep.Targets[i], p.allowRelativeCNAMETargets)
+				target, err := adjustCNAMETarget(ep.Targets[i], p.allowRelativeCNAMETargets)
+				if err != nil {
+					return nil, err
+				}
 				if ep.Targets[i] != target {
 					p.logger.Debug(
 						"adjusted endpoint target",
