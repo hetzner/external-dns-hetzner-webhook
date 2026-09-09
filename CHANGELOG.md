@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.4.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.4.1)
+
+[Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.4.0...v0.4.1)
+
+### Bug Fixes
+
+- apply idna encoding to cname targets (#183) ([1734f5b](https://github.com/hetzner/external-dns-hetzner-webhook/commit/1734f5ba263427a9bfd08699fb6663a7651ed4c6))
+
 ## [v0.4.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.4.0)
 
 [Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.4...v0.4.0)
