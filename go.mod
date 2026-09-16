@@ -3,7 +3,7 @@ module github.com/hetzner/external-dns-hetzner-webhook
 go 1.26.6
 
 require (
-	github.com/hetznercloud/hcloud-go/v2 v2.47.0
+	github.com/hetznercloud/hcloud-go/v2 v2.48.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/net v0.58.0
