@@ -290,12 +290,15 @@ func StartWebhook(client *hcloud.Client) {
 	logger := slog.New(slog.DiscardHandler)
 	provider := provider.NewProvider(client, logger, false)
 	startChan := make(chan struct{})
-	go webhook.StartHTTPApi(
-		provider,
-		startChan,
-		time.Second*60,
-		time.Second*60,
-		"localhost:8888",
-	)
+	go webhook.StartHTTPApi(webhook.ServerOptions{
+		Provider:          provider,
+		StartedChan:       startChan,
+		ProviderPort:      "localhost:8888",
+		ReadTimeout:       time.Second * 60,
+		WriteTimeout:      time.Second * 60,
+		ReadHeaderTimeout: time.Second * 5,
+		IdleTimeout:       time.Second * 30,
+		MaxBodySize:       32 << 20,
+	})
 	<-startChan
 }
