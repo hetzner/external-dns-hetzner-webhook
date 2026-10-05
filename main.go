@@ -21,6 +21,7 @@ import (
 
 const (
 	AllowRelativeCNAMETargets = "ALLOW_RELATIVE_CNAME_TARGETS"
+	WebhookMaxBodySize        = "WEBHOOK_MAX_BODY_SIZE"
 )
 
 func main() {
@@ -78,14 +79,27 @@ func main() {
 	if addr, ok := os.LookupEnv("WEBHOOK_ADDRESS"); ok {
 		address = addr
 	}
+
+	var maxBodySize int64 = 32 << 20
+	if env, ok := os.LookupEnv(WebhookMaxBodySize); ok {
+		maxBodySize, err = strconv.ParseInt(env, 10, 64)
+		if err != nil {
+			logger.Error("error parsing integer config value", "env", WebhookMaxBodySize, "error", err)
+			os.Exit(1)
+		}
+	}
+
 	startChan := make(chan struct{})
-	go webhookApi.StartHTTPApi(
-		provider,
-		startChan,
-		time.Second*60,
-		time.Second*60,
-		address,
-	)
+	go webhookApi.StartHTTPApi(webhookApi.ServerOptions{
+		Provider:          provider,
+		StartedChan:       startChan,
+		ProviderPort:      address,
+		ReadTimeout:       time.Second * 60,
+		WriteTimeout:      time.Second * 60,
+		ReadHeaderTimeout: time.Second * 5,
+		IdleTimeout:       time.Second * 30,
+		MaxBodySize:       maxBodySize,
+	})
 	<-startChan
 	logger.Info("Started webhook", "address", address)
 	metricsServer.SetReady(true)
