@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.5.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.5.0)
+
+[Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.4.0...v0.5.0)
+
+### Webhook request body size is now limited
+
+The webhook now rejects request bodies larger than 32 MiB. This matches the upstream default that ExternalDNS enforces since v0.23.0 through its `--webhook-provider-max-body-size` flag, which allows roughly 60k records per request.
+
+The default works for most setups. If you manage more records than that, raise the limit on both sides: set `WEBHOOK_MAX_BODY_SIZE` (in bytes) on the webhook and `--webhook-provider-max-body-size` on ExternalDNS. Set either one to `0` to turn its limit off.
+
+See the [configuration reference](docs/reference/configuration.md) for details.
+
+### Features
+
+- limit webhook request body size ([6df4106](https://github.com/hetzner/external-dns-hetzner-webhook/commit/6df4106148fab92fb79654ae430f405a064be561))
+- support Kubernetes v1.37 (#200) ([66f3ded](https://github.com/hetzner/external-dns-hetzner-webhook/commit/66f3ded99a910dc775c222e36b708b0906b688b2))
+
+### Bug Fixes
+
+- apply idna encoding to cname targets (#183) ([1734f5b](https://github.com/hetzner/external-dns-hetzner-webhook/commit/1734f5ba263427a9bfd08699fb6663a7651ed4c6))
+
 ## [v0.4.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.4.0)
 
 [Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.3.4...v0.4.0)
