@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.5.1](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.5.1)
+
+[Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.5.0...v0.5.1)
+
+### Bug Fixes
+
+- update Go to mitigate CVE-2026-111943 (#213) ([ecc05df](https://github.com/hetzner/external-dns-hetzner-webhook/commit/ecc05dfa4c45aeffb0e052f5fe2b21bf11237826))
+
 ## [v0.5.0](https://github.com/hetzner/external-dns-hetzner-webhook/releases/tag/v0.5.0)
 
 [Compare to previous version](https://github.com/hetzner/external-dns-hetzner-webhook/compare/v0.4.0...v0.5.0)
