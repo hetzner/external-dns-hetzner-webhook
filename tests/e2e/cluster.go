@@ -114,19 +114,19 @@ func (c *Cluster) ApplyService(
 
 	svc := &applyconfigurationscorev1.ServiceApplyConfiguration{
 		TypeMetaApplyConfiguration: metav1.TypeMetaApplyConfiguration{
-			Kind:       hcloud.Ptr("Service"),
-			APIVersion: hcloud.Ptr("v1"),
+			Kind:       new("Service"),
+			APIVersion: new("v1"),
 		},
 		ObjectMetaApplyConfiguration: &metav1.ObjectMetaApplyConfiguration{
 			Name:        &name,
 			Annotations: annotationsFull,
 		},
 		Spec: &applyconfigurationscorev1.ServiceSpecApplyConfiguration{
-			Type: hcloud.Ptr(corev1.ServiceTypeClusterIP),
+			Type: new(corev1.ServiceTypeClusterIP),
 			Ports: []applyconfigurationscorev1.ServicePortApplyConfiguration{
 				{
-					Port:       hcloud.Ptr[int32](80),
-					TargetPort: hcloud.Ptr(intstr.FromInt32(80)),
+					Port:       new(int32(80)),
+					TargetPort: new(intstr.FromInt32(80)),
 				},
 			},
 		},
