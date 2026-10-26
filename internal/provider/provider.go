@@ -174,7 +174,7 @@ func (p *Provider) applyCreateChanges(
 			Records: records,
 		}
 		if ep.RecordTTL.IsConfigured() {
-			opts.TTL = hcloud.Ptr(int(ep.RecordTTL))
+			opts.TTL = new(int(ep.RecordTTL))
 		}
 
 		action, _, err := p.client.Zone.AddRRSetRecords(ctx, zoneRRSet, opts)
@@ -273,7 +273,7 @@ func (p *Provider) applyUpdateChanges(
 			opts := hcloud.ZoneRRSetChangeTTLOpts{}
 
 			if endpointsNew[i].RecordTTL.IsConfigured() {
-				opts.TTL = hcloud.Ptr(int(endpointsNew[i].RecordTTL))
+				opts.TTL = new(int(endpointsNew[i].RecordTTL))
 			}
 
 			action, _, err := p.client.Zone.ChangeRRSetTTL(ctx, zoneRRSet, opts)
